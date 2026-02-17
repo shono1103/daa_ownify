@@ -1,0 +1,81 @@
+name: Bug report
+description: 不具合の報告
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        再現可能な情報をできるだけ具体的に記載してください。
+  - type: textarea
+    id: summary
+    attributes:
+      label: 概要
+      description: 何が起きているかを1-3行で記載してください。
+      placeholder: ログイン後に残高パネルで読み込みが失敗する
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: 再現できる最小手順を番号付きで記載してください。
+      placeholder: |
+        1. `/login` でログインする
+        2. `残高` タブに移動する
+        3. エラー表示になる
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待される動作
+      placeholder: 残高一覧が表示される
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際の動作
+      placeholder: 「残高の取得に失敗しました」と表示される
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 影響範囲
+      options:
+        - Auth (login/logout/me)
+        - Symbol Account
+        - Balance
+        - Holdings
+        - App Search
+        - Database/Prisma
+        - その他
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: 実行環境
+      description: OS / Node.js / pnpm / ブラウザなど
+      placeholder: Ubuntu 24.04 / Node 22.x / pnpm 10.x / Chrome 135
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: ログ・スクリーンショット
+      description: エラーログや画面キャプチャがあれば添付してください。
+      placeholder: stack trace / network response / screenshot
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 確認事項
+      options:
+        - label: 既存の Issue に重複がないことを確認した
+          required: true
+        - label: 再現手順を最小化した
+          required: true
+

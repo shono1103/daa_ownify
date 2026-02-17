@@ -1,0 +1,69 @@
+name: Feature request
+description: 機能追加・改善の提案
+title: "[Feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 背景・目的
+      description: 何を解決したいか、なぜ必要かを記載してください。
+      placeholder: 利用者が保有 app を素早く見つけられるようにしたい
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 提案内容
+      description: UI/API/データ構造の観点で具体的に記載してください。
+      placeholder: Holdings にフィルタ入力を追加し、名称で部分一致検索できるようにする
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 対象領域
+      options:
+        - Auth (login/logout/me)
+        - Symbol Account
+        - Balance
+        - Holdings
+        - App Search
+        - Database/Prisma
+        - Infrastructure/DevEx
+        - その他
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 受け入れ条件
+      description: 完了判定できる条件を箇条書きで記載してください。
+      placeholder: |
+        - [ ] Holdings 一覧を名称で絞り込める
+        - [ ] 0件時の表示が崩れない
+        - [ ] 既存機能に回帰がない
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: 影響・懸念点
+      description: 既存機能への影響、移行や運用の注意点があれば記載してください。
+      placeholder: API 変更は不要。クライアント側の状態管理のみ変更。
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 代替案
+      description: 検討した他案や採用しない理由があれば記載してください。
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: 確認事項
+      options:
+        - label: 既存の Issue / PR に重複がないことを確認した
+          required: true
+        - label: 提案の完了条件を定義した
+          required: true
+

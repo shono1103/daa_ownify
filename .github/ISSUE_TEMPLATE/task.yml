@@ -1,0 +1,57 @@
+name: Task
+description: 開発タスク（リファクタ、運用、調査など）
+title: "[Task] "
+labels:
+  - chore
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: タスク概要
+      placeholder: 認証周りのユーティリティを整理して重複を解消する
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: タスク種別
+      options:
+        - Refactor
+        - Docs
+        - Test
+        - CI/CD
+        - Dependency
+        - Investigation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 対象範囲
+      description: 対象ファイルやモジュールを記載してください。
+      placeholder: src/lib/auth/*, src/app/api/auth/*
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 完了条件
+      placeholder: |
+        - [ ] 重複実装を解消
+        - [ ] `pnpm lint` が通る
+        - [ ] 既存動作に回帰がない
+    validations:
+      required: true
+  - type: checkboxes
+    id: db_change
+    attributes:
+      label: DB/Prisma 変更
+      options:
+        - label: Prisma schema / migration の変更が含まれる
+  - type: textarea
+    id: note
+    attributes:
+      label: 補足
+      description: 依存関係、ブロッカー、調査メモなど
+
