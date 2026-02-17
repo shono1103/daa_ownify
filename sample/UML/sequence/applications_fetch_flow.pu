@@ -1,0 +1,19 @@
+@startuml
+participant "Home\nsrc/app/page.tsx" as Home
+participant "fetchApplications\nsrc/lib/applications.ts" as Fetch
+participant "Prisma Client\nsrc/lib/prisma.ts" as Prisma
+participant "@prisma/adapter-pg" as Adapter
+participant "pg.Pool" as Pool
+database "PostgreSQL\n(Application)" as DB
+
+Home -> Fetch: fetchApplications()
+Fetch -> Prisma: prisma.application.findMany()
+Prisma -> Adapter: query委譲
+Adapter -> Pool: 接続取得
+Pool -> DB: SELECT Application
+DB --> Pool: rows
+Pool --> Adapter: rows
+Adapter --> Prisma: rows
+Prisma --> Fetch: Application[]
+Fetch --> Home: Application[]
+@enduml

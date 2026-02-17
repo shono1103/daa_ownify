@@ -1,0 +1,24 @@
+@startuml
+actor User
+participant "LoginPage\nsrc/app/login/page.tsx" as LoginPage
+participant "POST /api/auth/login\nsrc/app/api/auth/login/route.ts" as LoginApi
+participant "Password\nsrc/lib/auth/password.ts" as Password
+participant "Session\nsrc/lib/auth/session.ts" as Session
+database "PostgreSQL\n(User, Session)" as DB
+
+User -> LoginPage: メール/パスワード入力
+LoginPage -> LoginApi: POST /api/auth/login
+LoginApi -> DB: User(email)取得
+LoginApi -> Password: verifyPassword(password, hash)
+Password --> LoginApi: true/false
+alt 認証成功
+  LoginApi -> Session: createSession(userId)
+  Session -> DB: Session INSERT
+  Session --> LoginApi: sessionId
+  LoginApi --> LoginPage: 200 + Set-Cookie(ownify_session)
+  LoginPage -> User: / へ遷移
+else 認証失敗
+  LoginApi --> LoginPage: 401
+  LoginPage -> User: エラー表示
+end
+@enduml

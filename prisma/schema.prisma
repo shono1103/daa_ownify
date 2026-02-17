@@ -1,0 +1,64 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SymbolNetwork {
+  mainnet
+  testnet
+}
+
+model User {
+  id             Int                 @id @default(autoincrement())
+  name           String
+  email          String              @unique
+  passwordHash   String?             @map("password_hash")
+  ownInfos       OwnInfo[]
+  sessions       Session[]
+  symbolAccounts UserSymbolAccount[]
+}
+
+model Session {
+  id        String   @id
+  userId    Int      @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@index([userId])
+}
+
+model UserSymbolAccount {
+  id        Int           @id @default(autoincrement())
+  userId    Int           @map("user_id")
+  network   SymbolNetwork
+  publicKey String        @map("public_key")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([userId, network])
+  @@unique([publicKey])
+}
+
+model Application {
+  id        Int       @id @default(autoincrement())
+  name      String
+  repoUrl   String    @map("repo_url")
+  totalCoin Int       @map("total_coin")
+  ownInfos  OwnInfo[]
+}
+
+model OwnInfo {
+  appId      Int         @map("app_id")
+  userId     Int         @map("user_id")
+  coinAmount Int         @map("coin_ammount")
+  app        Application @relation(fields: [appId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+
+  @@id([appId, userId])
+}

@@ -1,0 +1,24 @@
+@startuml
+actor Browser
+participant "middleware.ts" as Middleware
+participant "Home Page\nsrc/app/page.tsx" as Home
+participant "Session\nsrc/lib/auth/session.ts" as Session
+participant "Applications\nsrc/lib/applications.ts" as Apps
+database "PostgreSQL" as DB
+
+Browser -> Middleware: GET /
+alt ownify_session なし
+  Middleware --> Browser: 302 /login
+else ownify_session あり
+  Middleware --> Home: 続行
+  Home -> Session: getSessionUser(sessionId)
+  Session -> DB: Session + User 取得
+  alt 未認証
+    Home --> Browser: redirect(/login)
+  else 認証済み
+    Home -> Apps: fetchApplications()
+    Apps -> DB: Application 一覧取得
+    Home --> Browser: HomeClient描画
+  end
+end
+@enduml

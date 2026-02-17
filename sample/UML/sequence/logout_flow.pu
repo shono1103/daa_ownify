@@ -1,0 +1,14 @@
+@startuml
+actor User
+participant "Header\nsrc/app/components/home/Header.tsx" as Header
+participant "POST /api/auth/logout\nsrc/app/api/auth/logout/route.ts" as LogoutApi
+participant "Session\nsrc/lib/auth/session.ts" as Session
+database "PostgreSQL\n(Session)" as DB
+
+User -> Header: ログアウト押下
+Header -> LogoutApi: POST /api/auth/logout
+LogoutApi -> Session: deleteSession(sessionId)
+Session -> DB: Session DELETE
+LogoutApi --> Header: 200 + Cookie削除
+Header -> User: /login へ遷移
+@enduml

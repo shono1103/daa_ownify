@@ -1,0 +1,17 @@
+@startuml
+actor Client
+participant "GET /api/auth/me\nsrc/app/api/auth/me/route.ts" as MeApi
+participant "Session\nsrc/lib/auth/session.ts" as Session
+database "PostgreSQL\n(Session, User)" as DB
+
+Client -> MeApi: GET /api/auth/me (Cookie付き)
+MeApi -> Session: getSessionUser(sessionId)
+Session -> DB: Session + User 取得
+alt セッション有効
+  Session --> MeApi: user
+  MeApi --> Client: 200 { user }
+else 無効/期限切れ
+  Session -> DB: (期限切れなら削除)
+  MeApi --> Client: 401 { user: null }
+end
+@enduml

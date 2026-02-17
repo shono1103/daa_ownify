@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>App with Header Tabs</title>
+	<style>
+		:root {
+			--bg: #0b1220;
+			--panel: #0f1a30;
+			--panel2: #0c162b;
+			--text: #e6eefc;
+			--muted: #a6b2cc;
+			--line: rgba(255, 255, 255, 0.12);
+			--accent: #6aa7ff;
+			--accent2: #2b6bff;
+			--radius: 14px;
+			--shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+			--max: 1100px;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html,
+		body {
+			height: 100%;
+		}
+
+		body {
+			margin: 0;
+			font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans JP", sans-serif;
+			background: radial-gradient(1200px 600px at 20% 10%, rgba(106, 167, 255, 0.22), transparent 60%),
+				radial-gradient(900px 500px at 80% 30%, rgba(43, 107, 255, 0.18), transparent 65%),
+				var(--bg);
+			color: var(--text);
+		}
+
+		/* ===== App Shell ===== */
+		.app {
+			min-height: 100%;
+			display: grid;
+			grid-template-rows: auto 1fr auto;
+		}
+
+		header {
+			position: sticky;
+			top: 0;
+			z-index: 10;
+			background: rgba(11, 18, 32, 0.75);
+			backdrop-filter: blur(10px);
+			border-bottom: 1px solid var(--line);
+		}
+
+		.header-inner {
+			max-width: var(--max);
+			margin: 0 auto;
+			padding: 12px 16px;
+			display: grid;
+			grid-template-columns: auto 1fr auto;
+			gap: 12px;
+			align-items: center;
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			min-width: 160px;
+		}
+
+		.logo {
+			width: 34px;
+			height: 34px;
+			border-radius: 10px;
+			background: linear-gradient(135deg, var(--accent), var(--accent2));
+			box-shadow: 0 10px 20px rgba(43, 107, 255, 0.25);
+		}
+
+		.brand h1 {
+			font-size: 14px;
+			margin: 0;
+			letter-spacing: 0.2px;
+			line-height: 1.1;
+		}
+
+		.brand .sub {
+			font-size: 12px;
+			color: var(--muted);
+			margin-top: 2px;
+		}
+
+		/* ===== Tabs Nav ===== */
+		nav.tabs {
+			display: flex;
+			justify-content: center;
+		}
+
+		.tablist {
+			display: inline-flex;
+			gap: 6px;
+			padding: 6px;
+			border: 1px solid var(--line);
+			background: rgba(15, 26, 48, 0.55);
+			border-radius: 999px;
+			box-shadow: var(--shadow);
+		}
+
+		.tab {
+			appearance: none;
+			border: 0;
+			background: transparent;
+			color: var(--muted);
+			padding: 10px 12px;
+			border-radius: 999px;
+			cursor: pointer;
+			font-size: 13px;
+			line-height: 1;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			white-space: nowrap;
+			transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+		}
+
+		.tab:hover {
+			color: var(--text);
+			background: rgba(255, 255, 255, 0.06);
+		}
+
+		.tab[aria-selected="true"] {
+			color: #0b1220;
+			background: linear-gradient(135deg, rgba(106, 167, 255, 1), rgba(43, 107, 255, 1));
+			box-shadow: 0 10px 18px rgba(43, 107, 255, 0.25);
+		}
+
+		.tab:active {
+			transform: translateY(1px);
+		}
+
+		.header-actions {
+			display: flex;
+			justify-content: end;
+			align-items: center;
+			gap: 10px;
+			min-width: 180px;
+		}
+
+		.search {
+			display: none;
+			align-items: center;
+			gap: 8px;
+			padding: 8px 10px;
+			border: 1px solid var(--line);
+			background: rgba(15, 26, 48, 0.55);
+			border-radius: 12px;
+			color: var(--muted);
+		}
+
+		.search input {
+			width: 180px;
+			border: 0;
+			outline: none;
+			background: transparent;
+			color: var(--text);
+			font-size: 13px;
+		}
+
+		.btn {
+			border: 1px solid var(--line);
+			background: rgba(15, 26, 48, 0.55);
+			color: var(--text);
+			padding: 9px 12px;
+			border-radius: 12px;
+			cursor: pointer;
+			font-size: 13px;
+		}
+
+		.btn.primary {
+			border: 0;
+			background: linear-gradient(135deg, rgba(106, 167, 255, 1), rgba(43, 107, 255, 1));
+			color: #0b1220;
+			font-weight: 650;
+		}
+
+		/* ===== Main ===== */
+		main {
+			max-width: var(--max);
+			width: 100%;
+			margin: 0 auto;
+			padding: 18px 16px 28px;
+		}
+
+		.page {
+			display: none;
+			animation: fade 160ms ease;
+		}
+
+		.page.active {
+			display: block;
+		}
+
+		@keyframes fade {
+			from {
+				opacity: 0;
+				transform: translateY(4px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: 1.25fr 0.75fr;
+			gap: 14px;
+		}
+
+		.card {
+			background: linear-gradient(180deg, rgba(15, 26, 48, 0.86), rgba(12, 22, 43, 0.82));
+			border: 1px solid var(--line);
+			border-radius: var(--radius);
+			box-shadow: var(--shadow);
+			padding: 14px;
+		}
+
+		.card h2 {
+			margin: 0 0 6px;
+			font-size: 16px;
+			letter-spacing: 0.2px;
+		}
+
+		.card p {
+			margin: 0;
+			color: var(--muted);
+			font-size: 13px;
+			line-height: 1.6;
+		}
+
+		.kpi {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 10px;
+			margin-top: 12px;
+		}
+
+		.kpi .box {
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.03);
+			border-radius: 14px;
+			padding: 10px;
+		}
+
+		.kpi .label {
+			color: var(--muted);
+			font-size: 12px;
+		}
+
+		.kpi .value {
+			font-size: 18px;
+			font-weight: 700;
+			margin-top: 4px;
+		}
+
+		.list {
+			margin-top: 10px;
+			display: grid;
+			gap: 8px;
+		}
+
+		.item {
+			display: flex;
+			justify-content: space-between;
+			gap: 10px;
+			padding: 10px 12px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.03);
+			border-radius: 14px;
+		}
+
+		.item .left {
+			display: grid;
+			gap: 2px;
+		}
+
+		.item .title {
+			font-size: 13px;
+		}
+
+		.item .meta {
+			font-size: 12px;
+			color: var(--muted);
+		}
+
+		.badge {
+			font-size: 12px;
+			padding: 6px 10px;
+			border-radius: 999px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.04);
+			color: var(--text);
+			white-space: nowrap;
+		}
+
+		footer {
+			border-top: 1px solid var(--line);
+			color: var(--muted);
+			padding: 14px 16px;
+			text-align: center;
+			font-size: 12px;
+			background: rgba(11, 18, 32, 0.6);
+			backdrop-filter: blur(10px);
+		}
+
+		/* ===== Responsive ===== */
+		@media (max-width: 860px) {
+			.grid {
+				grid-template-columns: 1fr;
+			}
+
+			.header-inner {
+				grid-template-columns: auto 1fr;
+				grid-template-areas:
+					"brand actions"
+					"tabs tabs";
+			}
+
+			.brand {
+				grid-area: brand;
+				min-width: 0;
+			}
+
+			nav.tabs {
+				grid-area: tabs;
+				justify-content: start;
+				overflow: auto;
+			}
+
+			.header-actions {
+				grid-area: actions;
+				min-width: 0;
+			}
+
+			.tablist {
+				box-shadow: none;
+			}
+
+			.search {
+				display: none;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="app">
+		<header>
+			<div class="header-inner">
+				<div class="brand">
+					<div class="logo" aria-hidden="true"></div>
+					<div>
+						<h1>MyApp</h1>
+						<div class="sub">Header Tabs Navigation</div>
+					</div>
+				</div>
+
+				<nav class="tabs" aria-label="主要機能ナビゲーション">
+					<div class="tablist" role="tablist" aria-label="機能タブ">
+						<button class="tab" role="tab" data-route="dashboard" aria-selected="true">🏠 ダッシュボード</button>
+						<button class="tab" role="tab" data-route="projects" aria-selected="false">📁 プロジェクト</button>
+						<button class="tab" role="tab" data-route="tasks" aria-selected="false">✅ タスク</button>
+						<button class="tab" role="tab" data-route="reports" aria-selected="false">📊 レポート</button>
+						<button class="tab" role="tab" data-route="settings" aria-selected="false">⚙ 設定</button>
+					</div>
+				</nav>
+
+				<div class="header-actions">
+					<button class="btn" type="button" id="btnHelp">ヘルプ</button>
+					<button class="btn primary" type="button" id="btnNew">＋ 新規作成</button>
+				</div>
+			</div>
+		</header>
+
+		<main>
+			<!-- Dashboard -->
+			<section class="page active" id="page-dashboard" data-page="dashboard" aria-label="ダッシュボード">
+				<div class="grid">
+					<div class="card">
+						<h2>ダッシュボード</h2>
+						<p>ここにアプリの概況やショートカット、直近アクティビティなどを配置します。</p>
+
+						<div class="kpi" aria-label="KPI">
+							<div class="box">
+								<div class="label">進行中</div>
+								<div class="value">5</div>
+							</div>
+							<div class="box">
+								<div class="label">期限間近</div>
+								<div class="value">2</div>
+							</div>
+							<div class="box">
+								<div class="label">完了</div>
+								<div class="value">18</div>
+							</div>
+						</div>
+
+						<div class="list" aria-label="最近のアクティビティ">
+							<div class="item">
+								<div class="left">
+									<div class="title">仕様レビューを作成</div>
+									<div class="meta">10分前 • Projects</div>
+								</div>
+								<span class="badge">更新</span>
+							</div>
+							<div class="item">
+								<div class="left">
+									<div class="title">タスク「CI修正」を完了</div>
+									<div class="meta">1時間前 • Tasks</div>
+								</div>
+								<span class="badge">完了</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h2>クイック操作</h2>
+						<p>よく使う操作をまとめます。</p>
+						<div class="list">
+							<div class="item">
+								<div class="left">
+									<div class="title">新規プロジェクト</div>
+									<div class="meta">テンプレから開始</div>
+								</div>
+								<span class="badge">＋</span>
+							</div>
+							<div class="item">
+								<div class="left">
+									<div class="title">レポート出力</div>
+									<div class="meta">PDF / CSV</div>
+								</div>
+								<span class="badge">↗</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Projects -->
+			<section class="page" id="page-projects" data-page="projects" aria-label="プロジェクト">
+				<div class="card">
+					<h2>プロジェクト</h2>
+					<p>プロジェクト一覧・詳細・メンバー・権限などの画面を想定。</p>
+					<div class="list">
+						<div class="item">
+							<div class="left">
+								<div class="title">DAA Platform</div>
+								<div class="meta">メンバー: 3 • 最終更新: 今日</div>
+							</div>
+							<span class="badge">進行中</span>
+						</div>
+						<div class="item">
+							<div class="left">
+								<div class="title">Resume Generator</div>
+								<div class="meta">メンバー: 1 • 最終更新: 昨日</div>
+							</div>
+							<span class="badge">計画</span>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Tasks -->
+			<section class="page" id="page-tasks" data-page="tasks" aria-label="タスク">
+				<div class="card">
+					<h2>タスク</h2>
+					<p>カンバン・期限・優先度・担当者など。</p>
+					<div class="list">
+						<div class="item">
+							<div class="left">
+								<div class="title">ヘッダーのタブUIの調整</div>
+								<div class="meta">期限: 明日 • 優先度: 高</div>
+							</div>
+							<span class="badge">TODO</span>
+						</div>
+						<div class="item">
+							<div class="left">
+								<div class="title">PDF出力の余白確認</div>
+								<div class="meta">期限: 今週 • 優先度: 中</div>
+							</div>
+							<span class="badge">DOING</span>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Reports -->
+			<section class="page" id="page-reports" data-page="reports" aria-label="レポート">
+				<div class="card">
+					<h2>レポート</h2>
+					<p>集計・可視化・エクスポートなど。</p>
+					<div class="list">
+						<div class="item">
+							<div class="left">
+								<div class="title">週次サマリー</div>
+								<div class="meta">進捗 / 完了 / ブロッカー</div>
+							</div>
+							<span class="badge">生成</span>
+						</div>
+						<div class="item">
+							<div class="left">
+								<div class="title">プロジェクト別工数</div>
+								<div class="meta">CSV / JSON</div>
+							</div>
+							<span class="badge">出力</span>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Settings -->
+			<section class="page" id="page-settings" data-page="settings" aria-label="設定">
+				<div class="card">
+					<h2>設定</h2>
+					<p>プロフィール、通知、権限、テーマなど。</p>
+					<div class="list">
+						<div class="item">
+							<div class="left">
+								<div class="title">テーマ</div>
+								<div class="meta">ダーク / ライト</div>
+							</div>
+							<span class="badge">切替</span>
+						</div>
+						<div class="item">
+							<div class="left">
+								<div class="title">通知</div>
+								<div class="meta">メール / アプリ内</div>
+							</div>
+							<span class="badge">設定</span>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer>
+			© <span id="year"></span> MyApp • Header Tabs Demo
+		</footer>
+	</div>
+
+	<script>
+		// ===== Simple hash router (no framework) =====
+		const tabs = Array.from(document.querySelectorAll(".tab"));
+		const pages = Array.from(document.querySelectorAll(".page"));
+		const year = document.getElementById("year");
+		year.textContent = new Date().getFullYear();
+
+		function setRoute(route) {
+			// update hash (without full reload)
+			if (location.hash !== "#" + route) {
+				history.replaceState(null, "", "#" + route);
+			}
+
+			// tabs selected state
+			tabs.forEach(btn => {
+				const selected = (btn.dataset.route === route);
+				btn.setAttribute("aria-selected", selected ? "true" : "false");
+			});
+
+			// pages
+			pages.forEach(p => {
+				p.classList.toggle("active", p.dataset.page === route);
+			});
+		}
+
+		function getRouteFromHash() {
+			const h = (location.hash || "").replace("#", "").trim();
+			return h || "dashboard";
+		}
+
+		// click handlers
+		tabs.forEach(btn => {
+			btn.addEventListener("click", () => setRoute(btn.dataset.route));
+		});
+
+		// hash change (back/forward)
+		window.addEventListener("hashchange", () => setRoute(getRouteFromHash()));
+
+		// init
+		setRoute(getRouteFromHash());
+
+		// demo actions
+		document.getElementById("btnHelp").addEventListener("click", () => {
+			alert("ヘルプ: タブを押すとページが切り替わります。");
+		});
+		document.getElementById("btnNew").addEventListener("click", () => {
+			alert("新規作成: 実装ではモーダルや新規作成ページへ遷移します。");
+		});
+	</script>
+</body>
+
+</html>
