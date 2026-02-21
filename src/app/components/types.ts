@@ -1,4 +1,9 @@
-export type Route = "app-search" | "holdings" | "balance" | "my-page";
+export type Route =
+	| "app-search"
+	| "app-listing-request"
+	| "holdings"
+	| "balance"
+	| "my-page";
 
 export type ApplicationSummary = {
 	id: number;

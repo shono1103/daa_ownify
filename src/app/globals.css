@@ -406,6 +406,12 @@ main {
   margin-top: 14px;
 }
 
+.form-message {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 footer {
   border-top: 1px solid var(--line);
   color: var(--muted);

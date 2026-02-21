@@ -7,6 +7,7 @@ import type {
 	SymbolBalanceSummary,
 } from "./types";
 import { AppSearchPanel } from "./panels/AppSearchPanel";
+import { AppListingRequestPanel } from "./panels/AppListingRequestPanel";
 import { BalancePanel } from "./panels/BalancePanel";
 import { HoldingsPanel } from "./panels/HoldingsPanel";
 import { MyPagePanel } from "./panels/MyPagePanel";
@@ -43,6 +44,7 @@ export function Panels({
 				applications={applications}
 				applicationsFetchError={applicationsFetchError}
 			/>
+			<AppListingRequestPanel active={route === "app-listing-request"} />
 			<HoldingsPanel
 				active={route === "holdings"}
 				holdings={holdings}
