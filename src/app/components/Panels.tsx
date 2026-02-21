@@ -50,7 +50,11 @@ export function Panels({
 				applications={applications}
 				applicationsFetchError={applicationsFetchError}
 			/>
-			<AppListingRequestPanel active={route === "app-listing-request"} />
+			<AppListingRequestPanel
+				active={route === "app-listing-request"}
+				currentUser={currentUser}
+				applications={applications}
+			/>
 			<HoldingsPanel
 				active={route === "holdings"}
 				holdings={holdings}
