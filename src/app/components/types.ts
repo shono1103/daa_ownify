@@ -1,6 +1,7 @@
 export type Route =
 	| "app-search"
 	| "app-listing-request"
+	| "user-list"
 	| "holdings"
 	| "balance"
 	| "my-page";
@@ -47,3 +48,10 @@ export type SymbolBalanceSummary = {
 };
 
 export type AuthUser = UserSummary;
+
+export type AdminUserSummary = {
+	id: number;
+	name: string;
+	email: string;
+	role: "USER" | "ADMIN";
+};

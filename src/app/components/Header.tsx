@@ -1,5 +1,5 @@
 import type { AuthUser, Route } from "./types";
-import { tabConfig } from "./tabConfig";
+import { getTabConfig } from "./tabConfig";
 
 type HeaderProps = {
 	route: Route;
@@ -8,6 +8,8 @@ type HeaderProps = {
 };
 
 export function Header({ route, currentUser, onRouteChange }: HeaderProps) {
+	const tabConfig = getTabConfig(currentUser);
+
 	const handleLogout = async () => {
 		await fetch("/api/auth/logout", { method: "POST" });
 		window.location.href = "/login";

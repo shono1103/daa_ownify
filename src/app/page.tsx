@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AppShellClient } from "./components/AppShellClient";
 import type {
+	AdminUserSummary,
 	ApplicationSummary,
 	HoldingSummary,
 	SymbolAccountSummary,
@@ -13,6 +14,7 @@ import { fetchApplications } from "@/lib/applications";
 import { fetchHoldingsByUserId } from "@/lib/holdings";
 import { fetchSymbolAccountsByUserId } from "@/lib/symbol-account";
 import { fetchXymBalances } from "@/lib/symbol-balance";
+import { fetchAllUsersForAdmin } from "@/lib/users";
 
 export const dynamic = "force-dynamic";
 
@@ -74,6 +76,18 @@ export default async function Home() {
 		console.error("Failed to fetch symbol balances", error);
 	}
 
+	let adminUsers: AdminUserSummary[] = [];
+	let adminUsersFetchError = false;
+
+	if (user.role === "ADMIN") {
+		try {
+			adminUsers = await fetchAllUsersForAdmin();
+		} catch (error) {
+			adminUsersFetchError = true;
+			console.error("Failed to fetch users for admin", error);
+		}
+	}
+
 	return (
 		<AppShellClient
 			currentUser={currentUser}
@@ -85,6 +99,8 @@ export default async function Home() {
 			symbolAccountsFetchError={symbolAccountsFetchError}
 			symbolBalances={symbolBalances}
 			symbolBalancesFetchError={symbolBalancesFetchError}
+			adminUsers={adminUsers}
+			adminUsersFetchError={adminUsersFetchError}
 		/>
 	);
 }

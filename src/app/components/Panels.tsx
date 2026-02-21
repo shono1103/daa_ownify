@@ -1,4 +1,5 @@
 import type {
+	AdminUserSummary,
 	ApplicationSummary,
 	AuthUser,
 	HoldingSummary,
@@ -11,6 +12,7 @@ import { AppListingRequestPanel } from "./panels/AppListingRequestPanel";
 import { BalancePanel } from "./panels/BalancePanel";
 import { HoldingsPanel } from "./panels/HoldingsPanel";
 import { MyPagePanel } from "./panels/MyPagePanel";
+import { UserListPanel } from "./panels/UserListPanel";
 
 type PanelsProps = {
 	route: Route;
@@ -23,6 +25,8 @@ type PanelsProps = {
 	symbolAccountsFetchError: boolean;
 	symbolBalances: SymbolBalanceSummary[];
 	symbolBalancesFetchError: boolean;
+	adminUsers: AdminUserSummary[];
+	adminUsersFetchError: boolean;
 };
 
 export function Panels({
@@ -36,6 +40,8 @@ export function Panels({
 	symbolAccountsFetchError,
 	symbolBalances,
 	symbolBalancesFetchError,
+	adminUsers,
+	adminUsersFetchError,
 }: PanelsProps) {
 	return (
 		<main>
@@ -62,6 +68,13 @@ export function Panels({
 				symbolAccounts={symbolAccounts}
 				symbolAccountsFetchError={symbolAccountsFetchError}
 			/>
+			{currentUser.role === "ADMIN" && (
+				<UserListPanel
+					active={route === "user-list"}
+					users={adminUsers}
+					usersFetchError={adminUsersFetchError}
+				/>
+			)}
 		</main>
 	);
 }

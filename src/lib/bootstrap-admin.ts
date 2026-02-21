@@ -1,11 +1,17 @@
 import { randomBytes } from "node:crypto";
-import { UserRole } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { hashPassword } from "@/lib/auth/password";
 import { prisma } from "@/lib/prisma";
 
 const globalForBootstrap = globalThis as unknown as {
 	bootstrapAdminPromise?: Promise<void>;
 };
+const MAX_RETRIES = 5;
+const RETRY_DELAY_MS = 1500;
+
+function sleep(ms: number): Promise<void> {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function resolveBootstrapAdminConfig(): { email: string; name: string; password: string } {
 	const email = (process.env.BOOTSTRAP_ADMIN_EMAIL ?? "admin@example.com").trim().toLowerCase();
@@ -24,31 +30,53 @@ function resolveBootstrapAdminConfig(): { email: string; name: string; password:
 }
 
 async function bootstrapAdminIfNeeded(): Promise<void> {
-	const userCount = await prisma.user.count();
-	if (userCount > 0) {
-		return;
+	for (let attempt = 1; attempt <= MAX_RETRIES; attempt += 1) {
+		try {
+			const userCount = await prisma.user.count();
+			if (userCount > 0) {
+				return;
+			}
+
+			const { email, name, password } = resolveBootstrapAdminConfig();
+			const passwordHash = await hashPassword(password);
+
+			await prisma.user.create({
+				data: {
+					email,
+					name,
+					role: "ADMIN",
+					passwordHash,
+				},
+			});
+
+			console.log(`[bootstrap-admin] Created initial ADMIN user: ${email}`);
+			return;
+		} catch (error) {
+			if (
+				error instanceof Prisma.PrismaClientKnownRequestError &&
+				error.code === "P2021"
+			) {
+				console.warn("[bootstrap-admin] skipped: user table is not created yet. Run migrations.");
+				return;
+			}
+
+			const label = error instanceof Error ? error.message : String(error);
+			if (attempt < MAX_RETRIES) {
+				console.warn(`[bootstrap-admin] attempt ${attempt}/${MAX_RETRIES} failed: ${label}`);
+				await sleep(RETRY_DELAY_MS);
+				continue;
+			}
+			console.error(
+				`[bootstrap-admin] skipped after ${MAX_RETRIES} failed attempts: ${label}`,
+			);
+		}
 	}
-
-	const { email, name, password } = resolveBootstrapAdminConfig();
-	const passwordHash = await hashPassword(password);
-
-	await prisma.user.create({
-		data: {
-			email,
-			name,
-			role: UserRole.ADMIN,
-			passwordHash,
-		},
-	});
-
-	console.log(`[bootstrap-admin] Created initial ADMIN user: ${email}`);
 }
 
 export function ensureBootstrapAdmin(): Promise<void> {
 	if (!globalForBootstrap.bootstrapAdminPromise) {
-		globalForBootstrap.bootstrapAdminPromise = bootstrapAdminIfNeeded().catch((error) => {
+		globalForBootstrap.bootstrapAdminPromise = bootstrapAdminIfNeeded().catch(() => {
 			globalForBootstrap.bootstrapAdminPromise = undefined;
-			throw error;
 		});
 	}
 	return globalForBootstrap.bootstrapAdminPromise;
