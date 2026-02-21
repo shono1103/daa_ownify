@@ -46,11 +46,12 @@ model UserSymbolAccount {
 }
 
 model Application {
-  id        Int       @id @default(autoincrement())
-  name      String
-  repoUrl   String    @map("repo_url")
-  totalCoin Int       @map("total_coin")
-  ownInfos  OwnInfo[]
+  id               Int               @id @default(autoincrement())
+  name             String
+  repoUrl          String            @map("repo_url")
+  totalCoin        Int               @map("total_coin")
+  ownInfos         OwnInfo[]
+  appSymbolAccount AppSymbolAccount?
 }
 
 model OwnInfo {
@@ -61,4 +62,14 @@ model OwnInfo {
   user       User        @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([appId, userId])
+}
+
+model AppSymbolAccount {
+  applicationId Int         @id @map("application_id")
+  address       String
+  publicKey     String      @map("public_key")
+  privateKey    String      @map("private_key")
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("app_symbol_account")
 }
