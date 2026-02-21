@@ -25,6 +25,15 @@ export default async function Home() {
 		redirect("/login");
 	}
 
+	const currentUser =
+		user.role === "ADMIN"
+			? user
+			: {
+					id: user.id,
+					name: user.name,
+					email: user.email,
+				};
+
 	let applications: ApplicationSummary[] = [];
 	let applicationsFetchError = false;
 
@@ -67,7 +76,7 @@ export default async function Home() {
 
 	return (
 		<AppShellClient
-			currentUser={user}
+			currentUser={currentUser}
 			applications={applications}
 			applicationsFetchError={applicationsFetchError}
 			holdings={holdings}

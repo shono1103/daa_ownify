@@ -23,7 +23,7 @@ export type UserSummary = {
 	id: number;
 	name: string;
 	email: string;
-	role: "USER" | "ADMIN";
+	role?: "USER" | "ADMIN";
 };
 
 export type SymbolNetwork = "mainnet" | "testnet";

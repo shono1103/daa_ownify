@@ -13,16 +13,9 @@ function hashPassword(password) {
 const email = (process.argv[2] ?? "").trim().toLowerCase();
 const password = process.argv[3] ?? "";
 const name = process.argv[4] ?? "demo-user";
-const role = (process.argv[5] ?? "USER").trim().toUpperCase();
-const VALID_ROLES = new Set(["USER", "ADMIN"]);
 
 if (!email || !password) {
-  console.error("Usage: node scripts/set-password.mjs <email> <password> [name] [USER|ADMIN]");
-  process.exit(1);
-}
-
-if (!VALID_ROLES.has(role)) {
-  console.error("role must be USER or ADMIN");
+  console.error("Usage: node scripts/set-password.mjs <email> <password> [name]");
   process.exit(1);
 }
 
@@ -37,14 +30,24 @@ const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
 try {
   const passwordHash = hashPassword(password);
+  const userCount = await prisma.user.count();
+  const isBootstrap = userCount === 0;
+  const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
 
-  const user = await prisma.user.upsert({
-    where: { email },
-    create: { email, name, role, passwordHash },
-    update: { name, role, passwordHash },
-    select: { id: true, email: true, name: true, role: true },
-  });
+  const user = existing
+    ? await prisma.user.update({
+        where: { id: existing.id },
+        data: { name, passwordHash },
+        select: { id: true, email: true, name: true, role: true },
+      })
+    : await prisma.user.create({
+        data: { email, name, role: isBootstrap ? "ADMIN" : "USER", passwordHash },
+        select: { id: true, email: true, name: true, role: true },
+      });
 
+  if (isBootstrap) {
+    console.log("Bootstrap user is forced to ADMIN role.");
+  }
   console.log("Updated user:", user);
 } finally {
   await prisma.$disconnect();
