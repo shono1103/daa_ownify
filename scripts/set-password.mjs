@@ -13,9 +13,16 @@ function hashPassword(password) {
 const email = (process.argv[2] ?? "").trim().toLowerCase();
 const password = process.argv[3] ?? "";
 const name = process.argv[4] ?? "demo-user";
+const role = (process.argv[5] ?? "USER").trim().toUpperCase();
+const VALID_ROLES = new Set(["USER", "ADMIN"]);
 
 if (!email || !password) {
-  console.error("Usage: node scripts/set-password.mjs <email> <password> [name]");
+  console.error("Usage: node scripts/set-password.mjs <email> <password> [name] [USER|ADMIN]");
+  process.exit(1);
+}
+
+if (!VALID_ROLES.has(role)) {
+  console.error("role must be USER or ADMIN");
   process.exit(1);
 }
 
@@ -33,9 +40,9 @@ try {
 
   const user = await prisma.user.upsert({
     where: { email },
-    create: { email, name, passwordHash },
-    update: { name, passwordHash },
-    select: { id: true, email: true, name: true },
+    create: { email, name, role, passwordHash },
+    update: { name, role, passwordHash },
+    select: { id: true, email: true, name: true, role: true },
   });
 
   console.log("Updated user:", user);

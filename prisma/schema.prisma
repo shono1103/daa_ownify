@@ -12,10 +12,16 @@ enum SymbolNetwork {
   testnet
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model User {
   id             Int                 @id @default(autoincrement())
   name           String
   email          String              @unique
+  role           UserRole            @default(USER)
   passwordHash   String?             @map("password_hash")
   ownInfos       OwnInfo[]
   sessions       Session[]

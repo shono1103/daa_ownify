@@ -28,6 +28,13 @@ export function UserProfileSummary({ currentUser }: UserProfileSummaryProps) {
 				</div>
 				<span className="badge">email</span>
 			</div>
+			<div className="item">
+				<div className="left">
+					<div className="title">ロール</div>
+					<div className="meta">{currentUser.role}</div>
+				</div>
+				<span className="badge">role</span>
+			</div>
 		</div>
 	);
 }

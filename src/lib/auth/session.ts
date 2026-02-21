@@ -41,6 +41,7 @@ export async function getSessionUser(sessionId: string | undefined): Promise<Aut
 					id: true,
 					name: true,
 					email: true,
+					role: true,
 				},
 			},
 		},
