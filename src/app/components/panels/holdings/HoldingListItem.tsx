@@ -10,7 +10,7 @@ export function HoldingListItem({ holding }: HoldingListItemProps) {
 			<div className="left">
 				<div className="title">{holding.app.name}</div>
 				<div className="meta">
-					app_id: {holding.appId} • user_id: {holding.userId} • coin_ammount: {holding.coinAmount}
+					app_id: {holding.appId} • user_id: {holding.userId} • share_count: {holding.shareCount}
 				</div>
 			</div>
 			<span className="badge">保有中</span>

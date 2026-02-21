@@ -8,7 +8,7 @@ export async function fetchHoldingsByUserId(userId: number): Promise<HoldingSumm
 		select: {
 			appId: true,
 			userId: true,
-			coinAmount: true,
+			shareCount: true,
 			app: {
 				select: {
 					id: true,
@@ -23,7 +23,7 @@ export async function fetchHoldingsByUserId(userId: number): Promise<HoldingSumm
 	return rows.map((row) => ({
 		appId: row.appId,
 		userId: row.userId,
-		coinAmount: row.coinAmount,
+		shareCount: row.shareCount,
 		app: {
 			id: row.app.id,
 			name: row.app.name,

@@ -70,11 +70,11 @@ model Application {
 }
 
 model OwnInfo {
-  appId      Int         @map("app_id")
-  userId     Int         @map("user_id")
-  coinAmount Int         @map("coin_ammount")
-  app        Application @relation(fields: [appId], references: [id], onDelete: Restrict, onUpdate: Cascade)
-  user       User        @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  appId  Int         @map("app_id")
+  userId Int         @map("user_id")
+  shareCount Int     @default(0) @map("share_count")
+  app   Application @relation(fields: [appId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  user  User        @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Cascade)
 
   @@id([appId, userId])
 }

@@ -16,7 +16,7 @@ export type ApplicationSummary = {
 export type HoldingSummary = {
 	appId: number;
 	userId: number;
-	coinAmount: number;
+	shareCount: number;
 	app: ApplicationSummary;
 };
 
