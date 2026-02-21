@@ -17,15 +17,23 @@ enum UserRole {
   ADMIN
 }
 
+enum AppListingRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
-  id             Int                 @id @default(autoincrement())
-  name           String
-  email          String              @unique
-  role           UserRole            @default(USER)
-  passwordHash   String?             @map("password_hash")
-  ownInfos       OwnInfo[]
-  sessions       Session[]
-  symbolAccounts UserSymbolAccount[]
+  id                         Int                 @id @default(autoincrement())
+  name                       String
+  email                      String              @unique
+  role                       UserRole            @default(USER)
+  passwordHash               String?             @map("password_hash")
+  ownInfos                   OwnInfo[]
+  sessions                   Session[]
+  symbolAccounts             UserSymbolAccount[]
+  appListingRequests         AppListingRequest[] @relation("AppListingRequestedBy")
+  reviewedAppListingRequests AppListingRequest[] @relation("AppListingReviewedBy")
 }
 
 model Session {
@@ -52,12 +60,13 @@ model UserSymbolAccount {
 }
 
 model Application {
-  id               Int               @id @default(autoincrement())
-  name             String
-  repoUrl          String            @map("repo_url")
-  totalCoin        Int               @map("total_coin")
-  ownInfos         OwnInfo[]
-  appSymbolAccount AppSymbolAccount?
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  repoUrl            String              @map("repo_url")
+  totalCoin          Int                 @map("total_coin")
+  ownInfos           OwnInfo[]
+  appSymbolAccount   AppSymbolAccount?
+  appListingRequests AppListingRequest[]
 }
 
 model OwnInfo {
@@ -78,4 +87,25 @@ model AppSymbolAccount {
   application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("app_symbol_account")
+}
+
+model AppListingRequest {
+  id                Int                     @id @default(autoincrement())
+  applicationId     Int                     @map("application_id")
+  requestedByUserId Int                     @map("requested_by_user_id")
+  status            AppListingRequestStatus @default(PENDING)
+  reviewedByUserId  Int?                    @map("reviewed_by_user_id")
+  reviewedAt        DateTime?               @map("reviewed_at")
+  note              String?
+  createdAt         DateTime                @default(now()) @map("created_at")
+  updatedAt         DateTime                @updatedAt @map("updated_at")
+  application       Application             @relation(fields: [applicationId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  requestedByUser   User                    @relation("AppListingRequestedBy", fields: [requestedByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  reviewedByUser    User?                   @relation("AppListingReviewedBy", fields: [reviewedByUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+
+  @@index([applicationId])
+  @@index([requestedByUserId])
+  @@index([reviewedByUserId])
+  @@index([status])
+  @@map("app_listing_requests")
 }
